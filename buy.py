@@ -4,7 +4,7 @@ import pickle
 import os
 import time
 import pandas as pd
-from goldhand_client import client, bot, chat_id,BOT_TOKEN,open_orders_file
+from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file
 from functions import *
 
 

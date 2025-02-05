@@ -7,13 +7,13 @@ import telebot
 
 load_dotenv()
 
-APIKey = os.environ.get("APIKey")
-SecretKey = os.environ.get("SecretKey")
+API_KEY = os.environ.get("API_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-chat_id = os.environ.get("CHAT_ID")
+CHAT_ID = os.environ.get("CHAT_ID")
 open_orders_file = 'open_orders.pickle'
 
 
 
-client = Client(api_key=APIKey, api_secret=SecretKey, base_url='https://testnet.binance.vision', )
+client = Client(api_key=API_KEY, api_secret=SECRET_KEY, base_url='https://testnet.binance.vision', )
 bot = telebot.TeleBot(BOT_TOKEN)

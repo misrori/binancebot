@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 import plotly.graph_objects as go
 from decimal import Decimal, ROUND_DOWN
-from goldhand_client import client, bot, chat_id,BOT_TOKEN,open_orders_file
+from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file
 import pickle
 
 
@@ -45,7 +45,7 @@ def adjust_to_step_size(amount, step_size):
 
 def send_telegram_message(meassage, parse_mode_text="markdown"):
     try:
-        bot.send_message(chat_id=chat_id, text=meassage, parse_mode= parse_mode_text)
+        bot.send_message(chat_id=CHAT_ID, text=meassage, parse_mode= parse_mode_text)
     except:
         pass
 
