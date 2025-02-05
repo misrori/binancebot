@@ -10,7 +10,7 @@ from functions import *
 
 
 
-def find_buy_signals(rsi_buy_below = 30 ):
+def find_buy_signals(rsi_buy_below = 20 ):
     """Vételi szignálok keresése."""
     symbols = get_top_symbols(50)
 

@@ -10,7 +10,7 @@ import random
 from datetime import datetime, timezone
 
 
-def sell_positions (rsi_sell_above = 40):
+def sell_positions (rsi_sell_above = 80):
     positions = read_open_positions()
     print(len(positions))
 
