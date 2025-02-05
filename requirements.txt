@@ -1,0 +1,10 @@
+binance-connector
+pandas_ta
+python-dotenv
+plotly
+telebot
+kaleido
+scipy
+numpy==1.26.4
+setuptools
+ipython
