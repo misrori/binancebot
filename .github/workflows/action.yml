@@ -1,13 +1,13 @@
 name: run bot.py
 
-#on:
-#  push:
-#    branches:
-#      - main  # Change this to your default branch if it's not 'main'
-
 on:
-  schedule:
-    - cron: '0 4 * * *' 
+  push:
+    branches:
+      - main  # Change this to your default branch if it's not 'main'
+
+#on:
+#  schedule:
+#    - cron: '0 4 * * *' 
 
 
 jobs:
