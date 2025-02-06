@@ -34,7 +34,7 @@ def find_buy_signals(rsi_buy_below = 20 ):
                 print(f"Már van nyitott pozícióm: {symbol}")
             else:
                 try:
-                    buy_order = market_buy_asset(symbol, 1000)
+                    buy_order = market_buy_asset(symbol, 1001)
                     if buy_order is None:
                         print(f"Nem sikerült vásárolni a(z) {symbol}t.")
                         continue
