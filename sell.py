@@ -67,6 +67,8 @@ def sell_positions (rsi_sell_above = 80):
                 # Átalakítjuk másodpercekké
                 buy_time = datetime.fromtimestamp(buy_time_ms / 1000, tz=timezone.utc)
                 sell_time = datetime.fromtimestamp(sell_time_ms / 1000, tz=timezone.utc)
+                print(f"buy_time: {buy_time}")
+                print(f"sell_time: {sell_time}")
 
 
                 # Kiszámoljuk az eltelt időt
