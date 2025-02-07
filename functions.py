@@ -249,7 +249,7 @@ def send_trade_plot(actual_trade):
 
 
     # K-line adatok lekérése (1 perces gyertyák)
-    klines = client.klines(symbol=actual_trade['symbol'], interval="1m", startTime=start_time * 1000, endTime=sell_time * 1000)
+    klines = client.klines(symbol=actual_trade['symbol'], interval="5m", startTime=start_time * 1000, endTime=sell_time * 1000)
 
     # Adatok átalakítása DataFrame-be
     df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time',
