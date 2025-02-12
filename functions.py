@@ -233,47 +233,67 @@ def get_portfolio_value(to_telegram = False, number_of_rows = 10):
 
     return data
 
+def determine_interval(start_time, end_time):
+    """
+    Meghatározza a megfelelő gyertyaidőszakot úgy, hogy az adatpontok száma ne haladja meg az 1000-et.
+    """
+    duration_seconds = end_time - start_time  # Az időtartam másodpercben
+    intervals = [("1m", 60), ("5m", 300), ("15m", 900), ("1h", 3600), ("4h", 14400), ("1d", 86400)]
+    
+    for interval, seconds_per_candle in intervals:
+        num_candles = duration_seconds // seconds_per_candle
+        if num_candles <= 1000:
+            return interval  # Ezt az időintervallumot használjuk
+    
+    return "1d"  # Ha nagyon hosszú a trade időtartama, napi gyertyákat használunk
+
+
 
 def send_trade_plot(actual_trade):
 
-    # Vételi és eladási idők kinyerése (Unix timestamp milliszekundumban)
-    buy_time = actual_trade['buy_order']['transactTime'] // 1000  # másodpercre alakítjuk
+    buy_time = actual_trade['buy_order']['transactTime'] // 1000
     sell_time = actual_trade['sell_order']['transactTime'] // 1000
 
-    # Visszamegyünk 3 órát a vétel előtt
-    start_time = buy_time - (20*60)
+    # Három órával visszamegyünk a vételi időből
+    start_time = buy_time - (3 * 60 * 60)
 
-    # Időintervallum átalakítása dátum formátumba
-    start_dt = datetime.utcfromtimestamp(start_time)
-    end_dt = datetime.utcfromtimestamp(sell_time)
+    # Meghatározzuk a megfelelő időintervallumot
+    interval = determine_interval(start_time, sell_time)
 
-
-    # K-line adatok lekérése (1 perces gyertyák)
-    klines = client.klines(symbol=actual_trade['symbol'], interval="5m", startTime=start_time * 1000, endTime=sell_time * 1000)
+    # K-line adatok lekérése
+    klines = client.klines(
+        symbol=actual_trade['symbol'],
+        interval=interval,
+        startTime=start_time * 1000,
+        endTime=sell_time * 1000
+    )
 
     # Adatok átalakítása DataFrame-be
-    df = pd.DataFrame(klines, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time',
-                                    'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume',
-                                    'taker_buy_quote_asset_volume', 'ignore'])
+    df = pd.DataFrame(klines, columns=[
+        'timestamp', 'open', 'high', 'low', 'close', 'volume',
+        'close_time', 'quote_asset_volume', 'number_of_trades',
+        'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+    ])
 
-    # Időbélyegek konvertálása
-    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-    df['close'] = df['close'].astype(float)  # Záróárat float-tá alakítjuk
+    # Időbélyeg konvertálása
+    # Convert timestamps to datetime
+    df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
+    
+    # Convert prices to float
+    df[['open', 'high', 'low', 'close']] = df[['open', 'high', 'low', 'close']].astype(float)
 
-    # Plotly grafikon létrehozása
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=df['timestamp'],
-        y=df['close'],
-        mode='lines',
-        name=f"{actual_trade['symbol']} Árfolyam",
-        line=dict(color='blue')
+    # Create OHLC plot
+    fig = go.Figure(data=go.Ohlc(
+        x=df['date'],
+        open=df['open'],
+        high=df['high'],
+        low=df['low'],
+        close=df['close']
     ))
 
     # Jelöljük a vételi és eladási pontokat
     fig.add_trace(go.Scatter(
-        x=[datetime.utcfromtimestamp(buy_time)],
+        x=[pd.to_datetime(buy_time, unit='s')],
         y=[actual_trade['average_buy_price']],
         mode='markers',
         name='Vételi Ár',
@@ -281,7 +301,7 @@ def send_trade_plot(actual_trade):
     ))
 
     fig.add_trace(go.Scatter(
-        x=[datetime.utcfromtimestamp(sell_time)],
+        x=[pd.to_datetime(sell_time, unit='s')],
         y=[actual_trade['average_sell_price']],
         mode='markers',
         name='Eladási Ár',
@@ -290,14 +310,18 @@ def send_trade_plot(actual_trade):
 
     # Grafikon beállítások
     fig.update_layout(
-        title=f"{actual_trade['symbol']} Árfolyammozgás a Vétel és Eladás között",
+        title=f"{actual_trade['symbol']} Árfolyammozgás ({interval} gyertyák)",
         xaxis_title="Idő",
-        yaxis_title="Ár (USDC)",
-        template="plotly_dark",
+        yaxis_title="Ár (USDT)",
+        template="plotly_white",
         hovermode="x unified"
     )
+    fig.update_xaxes(mirror=True, ticks='outside', showline=True, linecolor='black', gridcolor='lightgrey')
+    fig.update_yaxes(mirror=True, ticks='outside', showline=True, linecolor='black', gridcolor='lightgrey')
+    fig.update(layout_xaxis_rangeslider_visible=False)
+    fig.update_layout(showlegend=False, height=800)
 
-    # Megjelenítés
+
     fig.write_image("static_plot.png")
     bot.send_photo(-1002368684493, photo=open('static_plot.png', 'rb'))
 
