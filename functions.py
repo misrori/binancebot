@@ -319,7 +319,7 @@ def send_trade_plot(actual_trade):
     fig.update_xaxes(mirror=True, ticks='outside', showline=True, linecolor='black', gridcolor='lightgrey')
     fig.update_yaxes(mirror=True, ticks='outside', showline=True, linecolor='black', gridcolor='lightgrey')
     fig.update(layout_xaxis_rangeslider_visible=False)
-    fig.update_layout(showlegend=False, height=800, width=1000)
+    fig.update_layout(showlegend=False, height=600, width=1000)
 
 
     fig.write_image("static_plot.png")
