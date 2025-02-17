@@ -12,6 +12,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 open_orders_file = 'open_orders.pickle'
+all_orders_file = 'all_orders.pickle'
+
 
 
 

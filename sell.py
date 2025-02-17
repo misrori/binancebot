@@ -4,7 +4,7 @@ import pickle
 import os
 import time
 import pandas as pd
-from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file
+from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file, all_orders_file
 from functions import *
 import random
 from datetime import datetime, timezone
@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 
 def sell_positions (rsi_sell_above = 80):
     positions = read_open_positions()
+    all_positoins = read_all_positions()
     print(len(positions))
 
     for i in range(len(positions)):
@@ -53,6 +54,10 @@ def sell_positions (rsi_sell_above = 80):
 
                 positions[i]['average_sell_price'] = sell_price
                 positions[i]['sell_order'] = sell_order_data
+
+                # Add to all orders
+                all_positoins.append(positions[i])
+
 
                 print(f"Result of trade: {result_of_trade:.2f}%, {profit_loss_usd} USD ")
 
@@ -114,6 +119,8 @@ def sell_positions (rsi_sell_above = 80):
             finally:
                 with open(open_orders_file, 'wb') as f:
                     pickle.dump(positions, f)
+                with open(all_orders_file, 'wb') as f:
+                    pickle.dump(all_positoins, f)
 
 
 sell_positions()

@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 import plotly.graph_objects as go
 from decimal import Decimal, ROUND_DOWN
-from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file
+from goldhand_client import client, bot, CHAT_ID, BOT_TOKEN, open_orders_file, all_orders_file
 import pickle
 
 
@@ -238,7 +238,7 @@ def determine_interval(start_time, end_time):
     Meghatározza a megfelelő gyertyaidőszakot úgy, hogy az adatpontok száma ne haladja meg az 1000-et.
     """
     duration_seconds = end_time - start_time  # Az időtartam másodpercben
-    intervals = [("1m", 60), ("5m", 300), ("15m", 900), ("1h", 3600), ("4h", 14400), ("1d", 86400)]
+    intervals = [("5m", 300), ("15m", 900), ("1h", 3600), ("4h", 14400), ("1d", 86400)]
     
     for interval, seconds_per_candle in intervals:
         num_candles = duration_seconds // seconds_per_candle
@@ -325,15 +325,25 @@ def send_trade_plot(actual_trade):
     fig.write_image("static_plot.png")
     bot.send_photo(-1002368684493, photo=open('static_plot.png', 'rb'))
 
-def read_open_positions(include_closed=False):
+def read_open_positions():
     """Olvassa be az aktuális nyitott pozíciókat."""
     if os.path.exists(open_orders_file):
         with open(open_orders_file, 'rb') as f:
             positions = pickle.load(f)
-            if include_closed:
-                return positions
             return [position for position in positions if position['status'] == 'open']
-    return []
+    else:
+        return []
+
+def read_all_positions():
+    """Olvassa be az aktuális nyitott pozíciókat."""
+    if os.path.exists(all_orders_file):
+        with open(open_orders_file, 'rb') as f:
+            positions = pickle.load(f)
+            return positions
+    else:
+        return []
+
+
 
 def get_top_symbols(num_symbols=50):
     """Lekérdezi a top USDC párokat."""
